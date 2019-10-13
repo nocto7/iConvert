@@ -14,16 +14,27 @@ struct ContentView: View {
     @State private var outputUnit = 1
     @State private var convertOption = 0
     
-    let convert = ["Temperature", "Volume"]
+    let convert = ["Temperature", "Volume", "Length", "Area", "Mass"]
     
-    let unitsTemp = ["Fahrenheit", "Celsius", "Kelvin"]
-    let unitsVol = ["ml", "cups"]
+    var unitsAllNames = [
+        ["Fahrenheit", "Celsius", "Kelvin"],
+        ["ml", "cups"],
+        ["miles", "kilometres", "nautical miles", "nm"],
+        ["acres", "square metres", "hectares"],
+        ["carats", "tonnes", "pounds"]]
     
-    var unitsAll : [[String]] {
-        return [unitsTemp, unitsVol]
+    var unitsAll : [[Dimension]] = [
+        [UnitTemperature.fahrenheit, UnitTemperature.celsius, UnitTemperature.kelvin],
+        [UnitVolume.milliliters, UnitVolume.cups],
+        [UnitLength.miles, UnitLength.kilometers, UnitLength.nauticalMiles, UnitLength.nanometers],
+        [UnitArea.acres, UnitArea.squareMeters, UnitArea.hectares],
+        [UnitMass.carats, UnitMass.metricTons, UnitMass.pounds]]
+    
+    var unitNames : [String] {
+        return unitsAllNames[convertOption]
     }
     
-    var units : [String] {
+    var units : [Dimension] {
         return unitsAll[convertOption]
     }
     
@@ -33,76 +44,12 @@ struct ContentView: View {
         return Double(input) ?? 0
     }
     
-    var inputTemp : Measurement<UnitTemperature>? {
-        switch inputUnit {
-        case 0:
-            return Measurement(value: inputNumber, unit: UnitTemperature.fahrenheit)
-        case 1:
-            return Measurement(value: inputNumber, unit: UnitTemperature.celsius)
-        case 2:
-            return Measurement(value: inputNumber, unit: UnitTemperature.kelvin)
-        default:
-            return nil
-        }
+    var input : Measurement<Dimension> {
+        Measurement(value: inputNumber, unit: units[inputUnit])
     }
     
-    var outputTemp : Measurement<UnitTemperature>? {
-        guard let input = inputTemp else { return nil }
-        switch outputUnit {
-        case 0:
-            return input.converted(to: UnitTemperature.fahrenheit)
-        case 1:
-            return input.converted(to: UnitTemperature.celsius)
-        case 2:
-            return input.converted(to: UnitTemperature.kelvin)
-        default:
-            return nil
-        }
-    }
-    
-    var inputVol : Measurement<UnitVolume>? {
-        switch inputUnit {
-        case 0:
-            return Measurement(value: inputNumber, unit: UnitVolume.milliliters)
-        case 1:
-            return Measurement(value: inputNumber, unit: UnitVolume.cups)
-        default:
-            return nil
-        }
-    }
-    
-    var outputVol : Measurement<UnitVolume>? {
-        guard let input = inputVol else { return nil }
-        switch outputUnit {
-        case 0:
-            return input.converted(to: UnitVolume.milliliters)
-        case 1:
-            return input.converted(to: UnitVolume.cups)
-        default:
-            return nil
-        }
-    }
-    
-    var inputString : String {
-        switch convertOption {
-        case 0: // temperature
-            return inputTemp?.description ?? ""
-        case 1: // volume
-            return inputVol?.description ?? ""
-        default:
-            return ""
-        }
-    }
-    
-    var outputString : String {
-        switch convertOption {
-        case 0: // temperature
-            return outputTemp?.description ?? ""
-        case 1: // volume
-            return outputVol?.description ?? ""
-        default:
-            return ""
-        }
+    var output : Measurement<Dimension> {
+        input.converted(to: units[outputUnit])
     }
     
     var body: some View {
@@ -123,8 +70,8 @@ struct ContentView: View {
                 
                 Section(header: Text("Convert from")) {
                     Picker("Input Unit", selection: $inputUnit) {
-                        ForEach(0 ..< units.count, id: \.self) {
-                            Text("\(self.units[$0])")
+                        ForEach(0 ..< unitNames.count, id: \.self) {
+                            Text("\(self.unitNames[$0])")
                         }
                     }
                     .id(convertOption)
@@ -133,17 +80,16 @@ struct ContentView: View {
                 
                 Section(header: Text("Convert to")) {
                     Picker("Input Unit", selection: $outputUnit) {
-                        ForEach(0 ..< units.count, id: \.self) {
-                            Text("\(self.units[$0])")
+                        ForEach(0 ..< unitNames.count, id: \.self) {
+                            Text("\(self.unitNames[$0])")
                         }
                     }
                     .id(convertOption)
                     .pickerStyle(SegmentedPickerStyle())
                 }
                 
-                Section(header: Text("\(inputString) converts to")) {
-                    Text(outputString)
-                    
+                Section(header: Text("\(input.description) converts to")) {
+                    Text(output.description)
                 }
             }.navigationBarTitle("iConvert")
         }
