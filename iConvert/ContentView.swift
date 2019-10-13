@@ -126,7 +126,9 @@ struct ContentView: View {
                         ForEach(0 ..< units.count, id: \.self) {
                             Text("\(self.units[$0])")
                         }
-                    }.pickerStyle(SegmentedPickerStyle())
+                    }
+                    .id(convertOption)
+                    .pickerStyle(SegmentedPickerStyle())
                 }
                 
                 Section(header: Text("Convert to")) {
@@ -134,7 +136,9 @@ struct ContentView: View {
                         ForEach(0 ..< units.count, id: \.self) {
                             Text("\(self.units[$0])")
                         }
-                    }.pickerStyle(SegmentedPickerStyle())
+                    }
+                    .id(convertOption)
+                    .pickerStyle(SegmentedPickerStyle())
                 }
                 
                 Section(header: Text("\(inputString) converts to")) {
