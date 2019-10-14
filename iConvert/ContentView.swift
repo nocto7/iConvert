@@ -10,8 +10,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var inputValue = ""
-    @State private var inputUnit = 0
-    @State private var outputUnit = 1
+    @State private var inputUnit = [0,0,0,0,0]
+    @State private var outputUnit = [1,1,1,1,1]
     @State private var convertOption = 0
     
     let convert = ["Temperature", "Volume", "Length", "Area", "Mass"]
@@ -35,7 +35,7 @@ struct ContentView: View {
     }
     
     var units : [Dimension] {
-        return unitsAll[convertOption]
+            return unitsAll[convertOption]
     }
     
     var inputNumber : Double {
@@ -45,11 +45,11 @@ struct ContentView: View {
     }
     
     var input : Measurement<Dimension> {
-        Measurement(value: inputNumber, unit: units[inputUnit])
+        Measurement(value: inputNumber, unit: units[inputUnit[convertOption]])
     }
     
     var output : Measurement<Dimension> {
-        input.converted(to: units[outputUnit])
+        input.converted(to: units[outputUnit[convertOption]])
     }
     
     var body: some View {
@@ -69,7 +69,7 @@ struct ContentView: View {
                 }
                 
                 Section(header: Text("Convert from")) {
-                    Picker("Input Unit", selection: $inputUnit) {
+                    Picker("Input Unit", selection: $inputUnit[convertOption]) {
                         ForEach(0 ..< unitNames.count, id: \.self) {
                             Text("\(self.unitNames[$0])")
                         }
@@ -79,7 +79,7 @@ struct ContentView: View {
                 }
                 
                 Section(header: Text("Convert to")) {
-                    Picker("Input Unit", selection: $outputUnit) {
+                    Picker("Input Unit", selection: $outputUnit[convertOption]) {
                         ForEach(0 ..< unitNames.count, id: \.self) {
                             Text("\(self.unitNames[$0])")
                         }
